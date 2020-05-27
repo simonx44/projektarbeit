@@ -47,10 +47,13 @@ export default ({ data }) => {
   const next = getNext(allPosts, currentPage.id)
   const authorPosts = getAllPostsOfAuthor(allPosts, author.id)
 
-  console.log(authorPosts)
-
+let siteUrl = null;
+siteUrl = typeof window !== `undefined` ? window.location.href : null;
   useEffect(() => {
     // Update the document title using the browser API
+
+console.log(siteUrl);
+
   }, [reiter])
 
   return (
@@ -81,7 +84,84 @@ export default ({ data }) => {
 
           <div className="post-content">
             {/*}  Social Icons -> To-Do  -> Einfügen*/  }
-           
+            <div className="simplesocialbuttons simplesocial-round-icon simplesocialbuttons_inline simplesocialbuttons-align-left post-267 post  simplesocialbuttons-inline-no-animation simplesocialbuttons-inline-in">
+              <button
+                onClick={() => {
+                
+                  let link =
+                    "https://web.whatsapp.com/send?text=" + window.location.href
+                  javascript: window.open(link, "_blank")
+                  return false
+                }}
+                className="simplesocial-whatsapp-share"
+                data-href={
+                  "https://web.whatsapp.com/send?text=" +  siteUrl
+                }
+              >
+                <span className="simplesocialtxt">WhatsApp</span>
+              </button>
+              <button
+                className="simplesocial-twt-share"
+                data-href={
+                  "https://twitter.com/share?text=" +
+                  currentPage.title +
+                  "&url"
+               
+                }
+                rel="nofollow"
+                onClick={() => {
+                  let link =
+                    "https://twitter.com/share?text=" +
+                    currentPage.title +
+                    "&url" +
+                    window.location.href
+                  javascript: window.open(
+                    link,
+                    "",
+                    "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600"
+                  )
+                  return false
+                }}
+              >
+                <span className="simplesocialtxt">Twitter</span>
+              </button>
+              <button
+                className="simplesocial-fb-share"
+                target="_blank"
+                data-href={
+                  "https://www.facebook.com/sharer/sharer.php?u=" 
+             
+                }
+                onClick={() => {
+                  let link =
+                    "https://www.facebook.com/sharer/sharer.php?u=" 
+             
+                  javascript: window.open(
+                    link,
+                    "",
+                    "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600"
+                  )
+                  return false
+                }}
+              >
+                <span className="simplesocialtxt">Facebook </span>
+              </button>
+              <button
+                onClick={() => {
+                  let link =
+                    "mailto:?subject=" +
+                    currentPage.title +
+                    "&body" +
+                    window.location.href
+                  window.location.href = link
+                  return false
+                }}
+                className="simplesocial-email-share"
+                data-href={"mailto:?subject="}
+              >
+                <span className="simplesocialtxt">Email</span>
+              </button>
+            </div>
 
             <div dangerouslySetInnerHTML={{ __html: currentPage.content }} />
 
