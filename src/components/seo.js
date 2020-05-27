@@ -72,7 +72,8 @@ function SEO({ description, lang, meta, title }) {
 SEO.defaultProps = {
   lang: `de`,
   meta: [],
-  description: ``,
+  title: `web-forward`,
+  description: `web-forward`,
 }
 
 SEO.propTypes = {

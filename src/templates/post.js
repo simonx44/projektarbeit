@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from "react"
+import React, { useState, useEffect } from "react"
 import Layout from "../layout/layoutBlog"
 import Image from "gatsby-image"
 import { Link } from "gatsby"
@@ -31,6 +31,17 @@ const getAllPostsOfAuthor = (posts, authorId) => {
   })
 }
 
+// Methode benötigt für den Bild-Prozess
+// Währendessen kein Zugriff auf window,document -> muss umgangen werden
+const getText = html => {
+  if (typeof document == `undefined`) {
+    return ""
+  }
+  var tmp = document.createElement("DIV")
+  tmp.innerHTML = html
+  return tmp.textContent || tmp.innerText || ""
+}
+
 export default ({ data }) => {
   const [reiter, setReiter] = useState(1)
 
@@ -45,17 +56,20 @@ export default ({ data }) => {
   const previous = getPrevious(allPosts, currentPage.id)
   const next = getNext(allPosts, currentPage.id)
   const authorPosts = getAllPostsOfAuthor(allPosts, author.id)
+  console.log(getText(currentPage.excerpt))
 
-let siteUrl = null;
-siteUrl = typeof window !== `undefined` ? window.location.href : null;
+  let siteUrl = null
+  siteUrl = typeof window !== `undefined` ? window.location.href : null
   useEffect(() => {
     // Update the document title using the browser API
-
   }, [reiter])
 
   return (
     <Layout>
-      <SEO title={currentPage.title} description={currentPage.excerpt} />
+      <SEO
+        title={getText(currentPage.title)}
+        description={getText(currentPage.excerpt)}
+      />
       <div
         className={
           "post post type-post status-publish format-standard has-post-thumbnail hentry " +
@@ -67,7 +81,6 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
           <Image
             className="attachment-post-image size-post-image wp-post-image"
             fluid={pic}
-         
           />
         </div>
         {/* featured-media */}
@@ -81,30 +94,26 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
           {/*.post-header */}
 
           <div className="post-content">
-            {/*}  Social Icons -> To-Do  -> Einfügen*/  }
+            {/*}  Social Icons -> To-Do  -> Einfügen*/}
             <div className="simplesocialbuttons simplesocial-round-icon simplesocialbuttons_inline simplesocialbuttons-align-left post-267 post  simplesocialbuttons-inline-no-animation simplesocialbuttons-inline-in">
               <button
+                aria-label="whatsapp"
                 onClick={() => {
-                
                   let link =
                     "https://web.whatsapp.com/send?text=" + window.location.href
                   window.open(link, "_blank")
                   return false
                 }}
                 className="simplesocial-whatsapp-share"
-                data-href={
-                  "https://web.whatsapp.com/send?text=" +  siteUrl
-                }
+                data-href={"https://web.whatsapp.com/send?text=" + siteUrl}
               >
                 <span className="simplesocialtxt">WhatsApp</span>
               </button>
               <button
+                aria-label="twitter"
                 className="simplesocial-twt-share"
                 data-href={
-                  "https://twitter.com/share?text=" +
-                  currentPage.title +
-                  "&url"
-               
+                  "https://twitter.com/share?text=" + currentPage.title + "&url"
                 }
                 rel="nofollow"
                 onClick={() => {
@@ -113,7 +122,7 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
                     currentPage.title +
                     "&url" +
                     window.location.href
-                    window.open(
+                  window.open(
                     link,
                     "",
                     "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600"
@@ -124,17 +133,14 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
                 <span className="simplesocialtxt">Twitter</span>
               </button>
               <button
+                aria-label="Facebook"
                 className="simplesocial-fb-share"
                 target="_blank"
-                data-href={
-                  "https://www.facebook.com/sharer/sharer.php?u=" 
-             
-                }
+                data-href={"https://www.facebook.com/sharer/sharer.php?u="}
                 onClick={() => {
-                  let link =
-                    "https://www.facebook.com/sharer/sharer.php?u=" 
-             
-                   window.open(
+                  let link = "https://www.facebook.com/sharer/sharer.php?u="
+
+                  window.open(
                     link,
                     "",
                     "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600"
@@ -145,6 +151,7 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
                 <span className="simplesocialtxt">Facebook </span>
               </button>
               <button
+                aria-label="Mail"
                 onClick={() => {
                   let link =
                     "mailto:?subject=" +
@@ -175,9 +182,7 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
               <li>
                 <Link
                   class={`${reiter === 3 ? "active" : ""} tab-comments-toggle`}
-                  onClick={
-                 
-                    event => {
+                  onClick={event => {
                     event.preventDefault()
                     setReiter(3)
                   }}
@@ -298,7 +303,7 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
                     className="avatar avatar-256 photo"
                     height="256"
                     width="256"
-                    alt = "Userpic"
+                    alt="Userpic"
                   />
                 </Link>
                 {/* Autoreninfo*/}

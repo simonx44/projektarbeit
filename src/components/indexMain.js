@@ -1,6 +1,7 @@
 import React, { useEffect } from "react"
 import { Link, graphql, useStaticQuery } from "gatsby"
 import Img from "gatsby-image"
+import SEO from "./seo"
 
 
 export function Index() {
@@ -32,6 +33,7 @@ export function Index() {
   return (
    
     <div className="wrapper-inner section-inner">
+      <SEO title={"web-forward"} description={"Der Blog für innovative Webtechnologien an der RWU Hochschule Ravensburg-Weingarten"} />
       <div className="content">
         <div className="posts" id="posts">
           {posts.map((element, index) => {

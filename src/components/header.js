@@ -39,7 +39,7 @@ useEffect(() => {
 
               return (
                 <li
-                  id="menu-item"
+            
                   class="menu-item menu-item-type-post_type menu-item-object-page menu-item"
                 >
                   <Link to={`/` + element.node.slug}>{element.node.title}</Link>
@@ -64,7 +64,7 @@ useEffect(() => {
 
               return (
                 <li
-                  id="menu-item"
+
                   className="menu-item menu-item-type-post_type menu-item-object-page menu-item"
                 >
                   <Link to={`/` + element.node.slug}>{element.node.title}</Link>

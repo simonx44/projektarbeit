@@ -1,9 +1,12 @@
-const path = require(`path`);
+const SITEURL = "https://www.web-forward.de"
+
+const path = require(`path`)
 module.exports = {
   siteMetadata: {
     title: `web-forward`,
     description: `Der Blog für innovative Webtechnologien an der RWU Hochschule Ravensburg-Weingarten`,
     author: `Simon Schwegler, Oliver Hagel`,
+    siteUrl: SITEURL
   },
   plugins: [
     {
@@ -37,38 +40,38 @@ Zudem: - icon erstellung
         ],
         display: `standalone`,
       },
-    },    
+    },
     /* stellt offline Funktionen zur Verfügung, bei schlechter Verbinding werden alle Daten vorgeladen*/
     `gatsby-plugin-offline`,
     /* */
     `gatsby-plugin-react-helmet`,
-      {
-        resolve: `gatsby-source-filesystem`,
-        options: {
-          name: `images`,
-          path: path.join(__dirname, `src`, `images`),
-        },
-      },
-      `gatsby-plugin-sharp`,
-      `gatsby-transformer-sharp`,
     {
-/*  Datenquelle WP konfigurieren  */
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `images`,
+        path: path.join(__dirname, `src`, `images`),
+      },
+    },
+    `gatsby-plugin-sharp`,
+    `gatsby-transformer-sharp`,
+    {
+      /*  Datenquelle WP konfigurieren  */
       resolve: `gatsby-source-wordpress`,
       options: {
-  
-        
-       baseUrl: `web-forward.de`,
-       protocol: `https`,
-       restApiRoutePrefix: "wp-json",
-       hostingWPCOM: false,
-       useACF: true
-
-      }
-
+        baseUrl: `web-forward.de`,
+        protocol: `https`,
+        restApiRoutePrefix: "wp-json",
+        hostingWPCOM: false,
+        useACF: true,
+      },
     },
-    // this (optional) plugin enables Progressive Web App + Offline functionality
-    // To learn more, visit: https://gatsby.dev/offline
-    // `gatsby-plugin-offline`,
+
+    // Einstellungen für die robot.txt
+    // sitemap erstellen mit allen Seiteninformationen
+    
+      `gatsby-plugin-sitemap`,
+      'gatsby-plugin-robots-txt'
+    
 
   ],
 }
