@@ -1,10 +1,9 @@
-import React, { useRef, useState, useEffect, Component } from "react"
+import React, { useState, useEffect} from "react"
 import Layout from "../layout/layoutBlog"
 import Image from "gatsby-image"
 import { Link } from "gatsby"
 import SEO from "../components/seo"
-import { useStaticQuery, graphql } from "gatsby"
-import { element } from "prop-types"
+import { graphql } from "gatsby"
 import userPic from "../images/user.png"
 
 //Vorgänger beschaffen
@@ -52,8 +51,6 @@ siteUrl = typeof window !== `undefined` ? window.location.href : null;
   useEffect(() => {
     // Update the document title using the browser API
 
-console.log(siteUrl);
-
   }, [reiter])
 
   return (
@@ -70,6 +67,7 @@ console.log(siteUrl);
           <Image
             className="attachment-post-image size-post-image wp-post-image"
             fluid={pic}
+         
           />
         </div>
         {/* featured-media */}
@@ -90,7 +88,7 @@ console.log(siteUrl);
                 
                   let link =
                     "https://web.whatsapp.com/send?text=" + window.location.href
-                  javascript: window.open(link, "_blank")
+                  window.open(link, "_blank")
                   return false
                 }}
                 className="simplesocial-whatsapp-share"
@@ -115,7 +113,7 @@ console.log(siteUrl);
                     currentPage.title +
                     "&url" +
                     window.location.href
-                  javascript: window.open(
+                    window.open(
                     link,
                     "",
                     "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600"
@@ -136,7 +134,7 @@ console.log(siteUrl);
                   let link =
                     "https://www.facebook.com/sharer/sharer.php?u=" 
              
-                  javascript: window.open(
+                   window.open(
                     link,
                     "",
                     "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600"
@@ -300,6 +298,7 @@ console.log(siteUrl);
                     className="avatar avatar-256 photo"
                     height="256"
                     width="256"
+                    alt = "Userpic"
                   />
                 </Link>
                 {/* Autoreninfo*/}

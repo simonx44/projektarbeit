@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, Component } from "react"
+import React, { useEffect } from "react"
 import { Link, graphql, useStaticQuery } from "gatsby"
 import Img from "gatsby-image"
 
@@ -30,6 +30,7 @@ export function Index() {
 
 
   return (
+   
     <div className="wrapper-inner section-inner">
       <div className="content">
         <div className="posts" id="posts">
@@ -37,7 +38,7 @@ export function Index() {
          
             const node = element.node
             const media = node.featured_media
-            const resolution = media.localFile.childImageSharp
+        
 
 // Nur 9 Elemente ausgeben
 if(index > 9){

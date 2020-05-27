@@ -1,7 +1,6 @@
-import React, { useRef, useState, useEffect, Component } from "react"
+import React, { useEffect } from "react"
 import { Link, graphql, useStaticQuery } from "gatsby"
 import Img from "gatsby-image"
-import { element } from "prop-types"
 
 
 export function Index() {

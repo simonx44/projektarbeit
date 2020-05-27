@@ -1,5 +1,4 @@
 import React, { Component } from "react"
-import { Link, graphql } from "gatsby"
 import Layout from "../layout/layoutIndex"
 import IndexMain from "../components/indexMain2"
 

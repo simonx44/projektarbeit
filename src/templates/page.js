@@ -1,6 +1,5 @@
-import React, { Component } from "react"
+import React from "react"
 import Layout from "../layout/layoutPage"
-import Img from "gatsby-image"
 import SEO from "../components/seo"
 
 export default ({ data }) => {
