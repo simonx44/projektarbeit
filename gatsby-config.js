@@ -60,6 +60,9 @@ Zudem: - icon erstellung
       options: {
         baseUrl: `web-forward.de`,
         protocol: `https`,
+
+        //baseUrl: `projektgatsby.local`,
+        //protocol: `http`,
         restApiRoutePrefix: "wp-json",
         hostingWPCOM: false,
         useACF: true,

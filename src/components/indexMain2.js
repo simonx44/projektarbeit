@@ -2,17 +2,13 @@ import React, { useEffect } from "react"
 import { Link, graphql, useStaticQuery } from "gatsby"
 import Img from "gatsby-image"
 
-
 export function Index() {
-  
   const data = useStaticQuery(pageQuery)
   const posts = data.allWordpressPost.edges
-
+  const comments = data.allWordpressWpComments.nodes
 
   useEffect(() => {
-    
-    const Masonry =
-      window ? require("masonry-layout") : null
+    const Masonry = window ? require("masonry-layout") : null
     if (!Masonry) {
       return
     }
@@ -22,29 +18,29 @@ export function Index() {
     var msnry = new Masonry(container, {
       // options...
       columnWidth: ".post-container",
-      itemSelector: ".post-container"
-
-    }) 
-   }, [])
-
-
+      itemSelector: ".post-container",
+    })
+  }, [])
 
   return (
     <div className="wrapper-inner section-inner">
       <div className="content">
         <div className="posts" id="posts">
           {posts.map((element, index) => {
-         
+            // Nur 9 Elemente ausgeben
+            if (index < 9) {
+              return;
+            }
             const node = element.node
             const media = node.featured_media
-            const resolution = media.localFile.childImageSharp
 
-// Nur 9 Elemente ausgeben
-if(index < 9){
-  return (<></>);
-}
+            const blogComments = comments.filter(x => {
+              return x.post == node.wordpress_id
+            })
+            const numberComment = blogComments ? blogComments.length : 0
+
             return (
-              <div key={node} className="post-container">
+              <div key={node.wordpress_id} className="post-container">
                 <div
                   id="post-219"
                   className="post-219 post type-post status-publish format-standard has-post-thumbnail hentry category-webtechnologien"
@@ -53,8 +49,9 @@ if(index < 9){
                     {/* Ändern} */}
                     <Link to={node.slug} rel="bookmark" title={node.title}>
                       <Img
-                      
-                        resolutions={resolution.resolutions}
+                        fluid={
+                          node.featured_media.localFile.childImageSharp.fluid
+                        }
                         className="attachment-post-thumbnail size-post-thumbnail wp-post-image"
                         alt={media.alt_text}
                       />
@@ -91,14 +88,15 @@ if(index < 9){
                         </div>
                       </Link>
 
-                      {/* Anpassen 
-    
-     <a className="post-meta-comments" href="https://web-forward.de/2020/05/electron-desktop-anwendungen-leicht-gemacht/#comments" title="0 Kommentare zu Electron: Desktop-Anwendungen leicht gemacht">
-                      
-    <div className="genericon genericon-comment"></div>
-
-    
-    */}
+                      <Link
+                        className="post-meta-comments"
+                        to={node.slug + "/#comments"}
+                        title={numberComment + "Kommentare"}
+                      >
+                        <div className="genericon genericon-comment">
+                          {numberComment}
+                        </div>
+                      </Link>
                     </div>
 
                     <div className="clear"></div>
@@ -111,15 +109,15 @@ if(index < 9){
       </div>
 
       <div className="archive-nav section-inner">
-      <Link to={"/"}
-  className="post-nav-older fright"
->Neuere Beiträge →</Link>
-    
+        <Link to={"/"} className="post-nav-older fright">
+          Neuere Beiträge →
+        </Link>
+
         <div className="clear"></div>
       </div>
     </div>
   )
-} 
+}
 
 export default Index
 
@@ -132,19 +130,23 @@ export const pageQuery = graphql`
           title
           slug
           excerpt
+          wordpress_id
           featured_media {
             localFile {
               childImageSharp {
-                resolutions {
-                  width
-                  src
-                  height
+                fluid {
+                  ...GatsbyImageSharpFluid
                 }
               }
             }
             alt_text
           }
         }
+      }
+    }
+    allWordpressWpComments {
+      nodes {
+        post
       }
     }
   }

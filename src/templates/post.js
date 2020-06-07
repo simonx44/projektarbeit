@@ -5,8 +5,165 @@ import { Link } from "gatsby"
 import SEO from "../components/seo"
 import { graphql } from "gatsby"
 import userPic from "../images/user.png"
+import $ from "jquery"
+import { element } from "prop-types"
 
-//Vorgänger beschaffen
+let siteUrl = null
+siteUrl = typeof window !== `undefined` ? window.location.href : null;
+/* Zugriff auf Wordpress API */
+
+const ACTION_URL = "http://blog.local/wp-json/wp/v2/comments"
+//const ACTION_URL1 = "https://web-forward.de/wp-json/wp/v2/comments";
+
+//       FUNCTION
+// Function: Erstellt Kommentar
+//   Parameter: commentData (Object): Kommentardaten 
+// Rückgabe: JSX Objekt mit erzeugtem Kommentar
+const createComment = commentData => {
+ 
+  const monthNames = [
+    "Januar",
+    "Februar",
+    "März",
+    "April",
+    "Mai",
+    "Juni",
+    "Juli",
+    "August",
+    "September",
+    "Oktober",
+    "November",
+    "Dezember",
+  ]
+
+  var d = new Date(commentData.date)
+
+  var commentDate =
+    ("0" + d.getDate()).slice(-2) +
+    ". " +
+    monthNames[d.getMonth()] +
+    " " +
+    d.getFullYear()
+  var commenttime =
+    +("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2)
+
+  var content = commentData.content.rendered;
+
+  var readyComment = (
+    <li key={commentData.id}
+      className="comment byuser comment-author even thread-even depth-1"
+      id="li-comment-2"
+    >
+      <div id="comment-2" className="comment">
+        <img
+          alt=""
+          src={userPic}
+          srcSet={userPic}
+          className="avatar avatar-80 photo"
+          height="80"
+          width="80"
+        />
+
+        <div className="comment-inner">
+          <div className="comment-header">
+            <h4>{commentData.author_name}</h4>
+
+            <p>
+              {commentDate}
+              <span>{" - " + commenttime}</span>
+            </p>
+          </div>
+
+          <div className="comment-content post-content">
+            <p dangerouslySetInnerHTML={{ __html: content }} />
+          </div>
+
+          <div className="comment-actions">
+            <a
+              rel="nofollow"
+              className="comment-reply-link"
+              href="#comment"
+              data-commentid={commentData.id}
+              data-postid={commentData.post}
+              data-respondelement="respond"
+              aria-label={"Reply to " + commentData.author_name}
+            >
+              {commentData.type == "new" ? "Warte auf Freischaltung" : "Antworten"}
+            </a>
+            <div className="clear"></div>
+          </div>
+        </div>
+      </div>
+    </li>
+  )
+
+  return readyComment
+}
+//       FUNCTION
+// Function: Erstellt Kommentar
+//   Parameter: event (Submit) --> beeinhaltet Form-Daten
+// Rückgabe: JSX Objekt mit erzeugtem Kommentar 
+const postComment = event => {
+  const [
+    comment,
+    author,
+    email,
+    url,
+    cookies,
+    submit,
+    postid,
+    parents,
+  ] = event.target.elements
+
+  const newComment = JSON.stringify({
+    post: 52, //postid.value,
+    author_name: author.value,
+    author_email: email.value,
+    content: comment.value,
+  })
+
+  const siteComment = {
+    post: 52,
+    author_name: author.value,
+    content: { rendered: comment.value },
+    date: new Date(),
+    type: "new",
+  }
+
+   fetch(ACTION_URL, {
+  method: 'post',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: newComment,
+})
+  .then((response) => {
+    
+    if (response.ok === true) {
+      // Submitted successfully!
+   
+    }
+    return response.json();
+  })
+  .then((object) => {
+    // Comment submission failed.
+    // Output `object.message` to see the error message.
+  })
+  .catch(error => console.error('Error:', error)); 
+
+   // Bestehende Eingabe löschen
+  $("#commentform")[0].reset();
+  return createComment(siteComment)
+}
+
+
+// Graphql Daten verarbeiten
+
+//       FUNCTION
+// Function: Vorgänger-Blog zum Post beschaffen
+//   Parameter: posts -> Alle Posts der Seite, id -> blog-ID
+// Rückgabe: Vorgänger Post
+
 const getPrevious = (posts, id) => {
   let previousPost = posts.filter(element => {
     return element.node.id === id
@@ -14,7 +171,12 @@ const getPrevious = (posts, id) => {
 
   return previousPost.length > 0 ? previousPost.pop().previous : null
 }
-//Nachfolger beschaffen
+
+
+//       FUNCTION
+// Function: Vorgänger-Blog zum Post beschaffen
+//   Parameter: posts -> Alle Posts der Seite, id -> blog-ID
+// Rückgabe: Nachfolger Post
 const getNext = (posts, id) => {
   let nextPost = posts.filter(element => {
     return element.node.id === id
@@ -23,16 +185,22 @@ const getNext = (posts, id) => {
   return nextPost.length > 0 ? nextPost.pop().next : null
 }
 
-// Beiträge eines Autors
-
+//       FUNCTION
+// Function: Beschafft alle Posts eines Autors
+//   Parameter: posts -> Alle Posts der Seite, authorId -> Id des Authors
+// Rückgabe: Posts vom Author
 const getAllPostsOfAuthor = (posts, authorId) => {
   return posts.filter(element => {
     return element.node.author.id === authorId
   })
 }
 
-// Methode benötigt für den Bild-Prozess
-// Währendessen kein Zugriff auf window,document -> muss umgangen werden
+
+//     FUNCTION
+// Function: Wird für den Gatsby-Build Prozess benötigt, da währenddessen kein Zugriff auf document oder window möglich ist
+//           Problematik kann so umgangen werden (Gatsby doc)
+
+
 const getText = html => {
   if (typeof document == `undefined`) {
     return ""
@@ -42,27 +210,51 @@ const getText = html => {
   return tmp.textContent || tmp.innerText || ""
 }
 
-export default ({ data }) => {
-  const [reiter, setReiter] = useState(1)
 
-  //Daten aus graphql
+
+
+// React Komponente
+
+export default ({ data }) => {
+//REACT STATE
+  const [reiter, setReiter] = useState(3); // Reiter zum Wechseln zwischen Kommentarbereich, Beitragsinfo, Autoreninfo
+  const [comments, setComments] = useState(null) // API - Beschaffung der Kommentare über get-Request
+  const [addedComments, setAddedComments] = useState([]) // Neuer Kommentar hinzufügen
+
+
+  /*       MUSS NOCH ANGEPASST WERDEN*/
+  const wpId = 52 // Testzweck -> currentPage.wordpress_id
+
+
+  /* data from graphql */
   const currentPage = data.wordpressPost
   const author = currentPage.author
   const allPosts = data.allWordpressPost.edges
-
-  const pic = currentPage.featured_media.localFile.childImageSharp.fluid
 
   // weitere Daten auslesen: Vorgänger, Nachfolger, Autorbeiträge
   const previous = getPrevious(allPosts, currentPage.id)
   const next = getNext(allPosts, currentPage.id)
   const authorPosts = getAllPostsOfAuthor(allPosts, author.id)
-  console.log(getText(currentPage.excerpt))
+  const pic = currentPage.featured_media.localFile.childImageSharp.fluid
 
-  let siteUrl = null
-  siteUrl = typeof window !== `undefined` ? window.location.href : null
+
+  // React HOOK -> wird nach jedem Render aufgerufen
   useEffect(() => {
-    // Update the document title using the browser API
-  }, [reiter])
+
+    //Kommentare der Api beschaffen
+    const loadComment = id => {
+      // document.addEventListener('DOMContentLoaded', function() {
+
+      //Daten von API beschaffen
+      return fetch(ACTION_URL + "?post=" + id)
+        .then(response => response.json())
+        .then(data => {
+          setComments(data)
+          return data
+        })
+    }
+    loadComment(wpId)
+  }, [])
 
   return (
     <Layout>
@@ -89,7 +281,7 @@ export default ({ data }) => {
           <div className="post-header">
             <p className="post-date">{currentPage.date}</p>
 
-            <h1 className="post-title">{currentPage.title}</h1>
+            <h1 className="post-title" dangerouslySetInnerHTML={{__html: currentPage.title}}/>
           </div>
           {/*.post-header */}
 
@@ -179,33 +371,36 @@ export default ({ data }) => {
           {/* 3.1 Tab-Selektor */}
           <div className="tab-selector">
             <ul>
-              <li>
+              <li key={"comment"}>
                 <Link
-                  class={`${reiter === 3 ? "active" : ""} tab-comments-toggle`}
+                  to={"/"}
+                  className={`${reiter === 3 ? "active" : ""} tab-comments-toggle`}
                   onClick={event => {
                     event.preventDefault()
                     setReiter(3)
                   }}
                 >
-                  <div class="genericon genericon-comment"></div>
+                  <div className="genericon genericon-comment"></div>
                   <span>Kommentare</span>
                 </Link>
               </li>
-              <li>
+              <li key={"autorinfo"}>
                 <Link
-                  class={`${reiter === 1 ? "active" : ""} tab-post-meta-toggle`}
+                  to={"/"}
+                  className={`${reiter === 1 ? "active" : ""} tab-post-meta-toggle`}
                   onClick={event => {
                     event.preventDefault()
                     setReiter(1)
                   }}
                 >
-                  <div class="genericon genericon-summary"></div>
+                  <div className="genericon genericon-summary"></div>
                   <span>Beitragsinfo</span>
                 </Link>
               </li>
-              <li>
+              <li key={"postinfo"}>
                 <Link
-                  class={`${
+                  to={"/"}
+                  className={`${
                     reiter === 2 ? "active" : ""
                   } tab-author-meta-toggle`}
                   onClick={event => {
@@ -213,12 +408,12 @@ export default ({ data }) => {
                     setReiter(2)
                   }}
                 >
-                  <div class="genericon genericon-user"></div>
+                  <div className="genericon genericon-user"></div>
                   <span>Autoreninfo</span>
                 </Link>
               </li>
 
-              <div class="clear"></div>
+              <div className="clear"></div>
             </ul>
           </div>
           {/* 3.2 Tabs - Content */}
@@ -232,9 +427,10 @@ export default ({ data }) => {
                 style={{ display: reiter === 1 ? "block" : "none" }}
               >
                 <ul className="post-info-items fright">
-                  <li>
+                  <li key={"user-icon"}>
                     <div className="genericon genericon-user"></div>
                     <Link
+                       to={"/"}
                       onClick={
                         //Bei Bedarf hinzufügen"
                         event => {
@@ -247,13 +443,13 @@ export default ({ data }) => {
                       {author.name}
                     </Link>
                   </li>
-                  <li>
+                  <li key={"blog-time"}>
                     <div className="genericon genericon-time"></div>
                     <Link to={"/"} title={""}>
                       {currentPage.date}
                     </Link>
                   </li>
-                  <li>
+                  <li key={"blog-cat"}>
                     <div className="genericon genericon-category"></div>
                     <Link to={"/"} rel="category tag">
                       {currentPage.categories[0].name}
@@ -307,7 +503,7 @@ export default ({ data }) => {
                   />
                 </Link>
                 {/* Autoreninfo*/}
-                <div class="author-meta-inner">
+                <div className="author-meta-inner">
                   <h3 className="author-name">
                     <Link
                       to={""} /*Anpassen */
@@ -330,11 +526,12 @@ export default ({ data }) => {
                     <ul>
                       {authorPosts.map((element, index) => {
                         if (index >= 5) {
-                          return <></>
+                          return;
                         }
+            
 
                         return (
-                          <li className="has-thumb">
+                          <li key={element.node.id} className="has-thumb">
                             <Link
                               to={"/" + element.node.slug}
                               title={element.node.title}
@@ -376,10 +573,160 @@ export default ({ data }) => {
                 </div>
               </div>
               {/* content */}
-            </div>
-            {/* Tab 3 Kommentare Status einfügen-> react*/}
+              <div
+                className="tab-comments tab"
+                style={{ display: reiter === 3 ? "block" : "none" }}
+              >
+                {/* Dynamischer Kommentarbereich */}
+                <div className="comments">
+                  <a name="comments"></a>
 
-            {/* Kommentar -Ende */}
+                  <div className="comments-title-container">
+                    <h2 className="comments-title fleft">
+                      {comments
+                        ? comments.length == 1
+                          ? "1 Kommentar"
+                          : comments.length + " Kommentare"
+                        : "0 Kommentare"}
+                    </h2>
+
+                    <h2 className="comments-subtitle fright">
+                      <a href="#respond">Add yours →</a>
+                    </h2>
+
+                    <div className="clear"></div>
+                  </div>
+                  <ol className="commentlist">
+                    {/* Kommentare von API */}
+                    {comments &&
+                      comments.map(element => {
+                        return createComment(element)
+                        
+                      })}
+                    {/* Neu hinzugefügte Kommentare */}
+                    {addedComments.length > 0 &&
+                      addedComments.map(comment => {
+                        return comment
+                      })}
+                  </ol>
+                </div>
+
+                <div id="respond" className="comment-respond">
+                  <h3 id="reply-title" className="comment-reply-title">
+                    Schreibe einen Kommentar
+                    <small>
+                      <Link
+                        rel="nofollow"
+                        id="cancel-comment-reply-link"
+                        to={
+                          "/2020/01/progressive-web-apps-die-zukunft-nativer-applikationen/#respond"
+                        }
+                        style={{ display: "none" }}
+                      >
+                        Antworten abbrechen
+                      </Link>
+                    </small>
+                  </h3>
+
+                  <form
+                    onSubmit={event => {
+                      event.preventDefault()
+                      var currentComment = postComment(event)
+                      setAddedComments([...addedComments, currentComment])
+
+                    }}
+                    //method="post"
+                    id="commentform"
+                    className="comment-form"
+                  >
+                    <p className="comment-notes">
+                      Deine E-Mail-Adresse wird nicht veröffentlicht.
+                    </p>
+                    <p className="comment-form-comment">
+                      <label htmlFor="comment">Kommentar</label>
+                      <textarea
+                        id="comment"
+                        name="comment"
+                        cols="45"
+                        rows="6"
+                        required=""
+                      ></textarea>
+                    </p>
+                    <p className="comment-form-author">
+                      <label htmlFor="author">
+                        Name <span className="required">*</span>
+                      </label>
+                      <input
+                        id="author"
+                        name="author"
+                        type="text"
+                        size="30"
+                        maxLength="245"
+                        required="required"
+                      />
+                    </p>
+                    <p className="comment-form-email">
+                      <label htmlFor="email">
+                        E-Mail <span className="required">*</span>
+                      </label>
+                      <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        size="30"
+                        maxLength="100"
+                        required="required"
+                      />
+                    </p>
+                    <p className="comment-form-url">
+                      <label htmlFor="url">Website</label>
+                      <input
+                        id="url"
+                        name="url"
+                        type="text"
+                        size="30"
+                        maxLength="200"
+                      />
+                    </p>
+                    <p className="comment-form-cookies-consent">
+                      <input
+                        id="wp-comment-cookies-consent"
+                        name="wp-comment-cookies-consent"
+                        type="checkbox"
+                      />
+                      <label htmlFor="wp-comment-cookies-consent">
+                        Meinen Namen, E-Mail und Website in diesem Browser
+                        speichern, bis ich wieder kommentiere.
+                      </label>
+                    </p>
+                    <p className="form-submit">
+                      <input
+                        name="submit"
+                        type="submit"
+                        id="submit"
+                        className="submit"
+                        value="Kommentar abschicken"
+                      />
+                      <input
+                        type="hidden"
+                        name="comment_post_ID"
+                        value={currentPage.wordpress_id}
+                        id="comment_post_ID"
+                      />
+                      <input
+                        type="hidden"
+                        name="comment_parent"
+                        id="comment_parent"
+                        value="0"
+                      />
+                    </p>
+                  </form>
+                  {/* Direkt ohne Form */}
+                </div>
+              </div>
+
+              {/* Ende */}
+            </div>
           </div>
           {/* 3.2 Tabs - Content */}
           {/* 3.2 Tabs*/}
@@ -456,6 +803,7 @@ export const pageQuery = graphql`
       slug
       id
       excerpt
+      wordpress_id
       content
       author {
         name

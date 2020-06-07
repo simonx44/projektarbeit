@@ -28,7 +28,7 @@ useEffect(() => {
       <div className="navigation">
         <div className="section-inner">
           <ul className="main-menu">
-            <li className="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item">
+            <li key={"/home"} className="menu-item menu-item-type-custom menu-item-object-custom current-menu-item current_page_item menu-item-home menu-item">
               <Link to={`/`} aria-current={"page"}>
                 Home
               </Link>
@@ -38,9 +38,9 @@ useEffect(() => {
               if (element.node.slug === "impressum") return null
 
               return (
-                <li
+                <li key={element.node.slug}
             
-                  class="menu-item menu-item-type-post_type menu-item-object-page menu-item"
+                  className="menu-item menu-item-type-post_type menu-item-object-page menu-item"
                 >
                   <Link to={`/` + element.node.slug}>{element.node.title}</Link>
                 </li>
@@ -63,7 +63,7 @@ useEffect(() => {
               if (element.node.slug === "impressum") return null
 
               return (
-                <li
+                <li key={"mobile"+element.node.slug}
 
                   className="menu-item menu-item-type-post_type menu-item-object-page menu-item"
                 >

@@ -11,4 +11,5 @@ Dient zum Einbinden der CSS-Dateien
 
 import "./src/styles/style.css"
 import "./src/styles/front.css"
-//import "./src/styles/genericons.css"
+import "./src/styles/enlighter.css"
+import "./src/plugin/genericons/genericons.css"

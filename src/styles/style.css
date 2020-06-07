@@ -41,8 +41,27 @@
 /*	0. CSS Reset
 /* -------------------------------------------------------------------------------- */
 
+/* Zusatz
+
+
+
+*/
+
+
+
+video{
+
+	max-width: 100%;
+
+}
 
 html, body { margin:0; padding:0;}
+
+html{
+
+scroll-behavior: smooth;
+
+}
 
 h1, h2, h3, h4, h5, h6, p, blockquote, address, big, cite, code, em, font, img, small, strike, sub, sup, li, ol, ul, fieldset, form, label, legend, button, table, caption, tr, th, td {
 	margin:0;

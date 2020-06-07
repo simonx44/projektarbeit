@@ -8,14 +8,14 @@ export default ({ data }) => {
   return (
     <Layout>
        <SEO title={ currentPage.title} description={currentPage.excerpt} />
-      <div class="post">
-        <div class="post-inner">
-          <div class="post-header">
-            <h1 class="post-title">{currentPage.title}</h1>
+      <div className="post">
+        <div className="post-inner">
+          <div className="post-header">
+            <h1 className="post-title">{currentPage.title}</h1>
           </div>
 
           <div
-            class="post-content"
+            className="post-content"
             dangerouslySetInnerHTML={{ __html: currentPage.content }}
           />
           <div className="clear"></div>
