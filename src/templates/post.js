@@ -6,14 +6,13 @@ import SEO from "../components/seo"
 import { graphql } from "gatsby"
 import userPic from "../images/user.png"
 import $ from "jquery"
-import { element } from "prop-types"
 
 let siteUrl = null
 siteUrl = typeof window !== `undefined` ? window.location.href : null;
 /* Zugriff auf Wordpress API */
 
-const ACTION_URL = "http://blog.local/wp-json/wp/v2/comments"
-//const ACTION_URL1 = "https://web-forward.de/wp-json/wp/v2/comments";
+//const ACTION_URL = "http://blog.local/wp-json/wp/v2/comments"
+const ACTION_URL = "https://web-forward.de/wp-json/wp/v2/comments";
 
 //       FUNCTION
 // Function: Erstellt Kommentar
@@ -88,7 +87,7 @@ const createComment = commentData => {
               data-respondelement="respond"
               aria-label={"Reply to " + commentData.author_name}
             >
-              {commentData.type == "new" ? "Warte auf Freischaltung" : "Antworten"}
+              {commentData.type === "new" ? "Warte auf Freischaltung" : "Antworten"}
             </a>
             <div className="clear"></div>
           </div>
@@ -101,6 +100,9 @@ const createComment = commentData => {
 }
 //       FUNCTION
 // Function: Erstellt Kommentar
+// Funktionniert noch nicht mit hinterlegter URL ->
+// add_filter( 'rest_allow_anonymous_comments', '__return_true' );
+// muss in function.php aufgenommen werden (Wordpress)
 //   Parameter: event (Submit) --> beeinhaltet Form-Daten
 // Rückgabe: JSX Objekt mit erzeugtem Kommentar 
 const postComment = event => {
@@ -116,14 +118,14 @@ const postComment = event => {
   ] = event.target.elements
 
   const newComment = JSON.stringify({
-    post: 52, //postid.value,
+    post: postid.value,
     author_name: author.value,
     author_email: email.value,
     content: comment.value,
   })
 
   const siteComment = {
-    post: 52,
+    post: postid.value,
     author_name: author.value,
     content: { rendered: comment.value },
     date: new Date(),
@@ -222,9 +224,6 @@ export default ({ data }) => {
   const [addedComments, setAddedComments] = useState([]) // Neuer Kommentar hinzufügen
 
 
-  /*       MUSS NOCH ANGEPASST WERDEN*/
-  const wpId = 52 // Testzweck -> currentPage.wordpress_id
-
 
   /* data from graphql */
   const currentPage = data.wordpressPost
@@ -237,6 +236,7 @@ export default ({ data }) => {
   const authorPosts = getAllPostsOfAuthor(allPosts, author.id)
   const pic = currentPage.featured_media.localFile.childImageSharp.fluid
 
+  const wpId = currentPage.wordpress_id; // 52 // Testzweck -> 
 
   // React HOOK -> wird nach jedem Render aufgerufen
   useEffect(() => {
@@ -254,7 +254,7 @@ export default ({ data }) => {
         })
     }
     loadComment(wpId)
-  }, [])
+  }, [wpId])
 
   return (
     <Layout>

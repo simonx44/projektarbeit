@@ -1,9 +1,8 @@
 import React, { useEffect } from "react"
-import { Link, graphql, useStaticQuery } from "gatsby"
+import { Link } from "gatsby"
 import Img from "gatsby-image"
 
-export function Index() {
-  const data = useStaticQuery(pageQuery)
+export function Index({data}) {
   const posts = data.allWordpressPost.edges
   const comments = data.allWordpressWpComments.nodes
 
@@ -35,7 +34,7 @@ export function Index() {
             const media = node.featured_media
 
             const blogComments = comments.filter(x => {
-              return x.post == node.wordpress_id
+              return x.post === node.wordpress_id
             })
             const numberComment = blogComments ? blogComments.length : 0
 
@@ -121,33 +120,3 @@ export function Index() {
 
 export default Index
 
-export const pageQuery = graphql`
-  query {
-    allWordpressPost {
-      edges {
-        node {
-          date(formatString: "DD.MMMM YYYY")
-          title
-          slug
-          excerpt
-          wordpress_id
-          featured_media {
-            localFile {
-              childImageSharp {
-                fluid {
-                  ...GatsbyImageSharpFluid
-                }
-              }
-            }
-            alt_text
-          }
-        }
-      }
-    }
-    allWordpressWpComments {
-      nodes {
-        post
-      }
-    }
-  }
-`

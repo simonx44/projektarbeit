@@ -1,10 +1,10 @@
 import React, { useEffect } from "react"
-import { Link, graphql, useStaticQuery } from "gatsby"
+import { Link} from "gatsby"
 import Img from "gatsby-image"
 import SEO from "./seo"
 
-export function Index() {
-  const data = useStaticQuery(pageQuery)
+const Index = ({data}) => {
+
   const posts = data.allWordpressPost.edges
   const comments = data.allWordpressWpComments.nodes
 
@@ -39,16 +39,15 @@ export function Index() {
             posts.map((element, index) => {
               // Nur 9 Elemente ausgeben
               if (index > 9) {
-                return
+                return;
               }
               const node = element.node
               const media = node.featured_media
 
               const blogComments = comments.filter(x => {
-                return x.post == node.wordpress_id
+                return x.post === node.wordpress_id
               })
               const numberComment = blogComments ? blogComments.length : 0
-              console.log(node)
 
               return (
                 <div key={node.wordpress_id} className="post-container">
@@ -126,39 +125,8 @@ export function Index() {
 
         <div className="clear"></div>
       </div>
-    </div>
-  )
+    </div>)
+  
 }
 
 export default Index
-
-export const pageQuery = graphql`
-  query {
-    allWordpressPost {
-      edges {
-        node {
-          date(formatString: "DD.MMMM YYYY")
-          title
-          slug
-          excerpt
-          wordpress_id
-          featured_media {
-            localFile {
-              childImageSharp {
-                fluid {
-                  ...GatsbyImageSharpFluid
-                }
-              }
-            }
-            alt_text
-          }
-        }
-      }
-    }
-    allWordpressWpComments {
-      nodes {
-        post
-      }
-    }
-  }
-`

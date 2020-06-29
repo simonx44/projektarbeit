@@ -6,7 +6,7 @@ class Homepage extends Component {
   render() {
     return (
   <Layout>
-<IndexMain/>  
+<IndexMain data={this.props.data}/>  
   </Layout>
     )
   }
@@ -14,3 +14,33 @@ class Homepage extends Component {
 
 export default Homepage
 
+export const pageQuery = graphql`
+  query {
+    allWordpressPost {
+      edges {
+        node {
+          date(formatString: "DD.MMMM YYYY")
+          title
+          slug
+          excerpt
+          wordpress_id
+          featured_media {
+            localFile {
+              childImageSharp {
+                fluid {
+                  ...GatsbyImageSharpFluid
+                }
+              }
+            }
+            alt_text
+          }
+        }
+      }
+    }
+    allWordpressWpComments {
+      nodes {
+        post
+      }
+    }
+  }
+`
